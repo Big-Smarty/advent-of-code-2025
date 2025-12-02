@@ -75,7 +75,8 @@ fn check_validity_2(id: u64) -> bool {
                 }
             }
         })
-        .fold(true, |out, b| out & b)
+        .all(|i| i)
+    //.fold(true, |out, b| out & b)
 }
 
 fn get_range_vec(input: &str) -> Vec<Range> {
