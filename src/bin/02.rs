@@ -1,0 +1,81 @@
+advent_of_code::solution!(2);
+
+#[derive(Debug)]
+struct Range {
+    min: u64,
+    max: u64,
+}
+
+impl Range {
+    pub fn new(input: &str) -> Self {
+        let minmax = input
+            .split('-')
+            .into_iter()
+            .map(|i| i.parse::<u64>().unwrap())
+            .collect::<Vec<u64>>();
+        Self {
+            min: minmax[0],
+            max: minmax[1],
+        }
+    }
+
+    pub fn get_invalid_sum(&self) -> u64 {
+        (self.min..=self.max)
+            .filter(|i| !check_validity(*i))
+            .fold(0, |count, i| count + i)
+    }
+}
+
+fn check_validity(id: u64) -> bool {
+    let id_str = id.to_string();
+    if id_str.len() % 2 != 0 {
+        return true;
+    } else {
+        let (upper, lower) = id_str.split_at(id_str.len() / 2);
+        if upper == lower {
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
+
+fn get_range_vec(input: &str) -> Vec<Range> {
+    input
+        .replace("\n", "")
+        .split(',')
+        .map(|i| Range::new(i))
+        .collect()
+}
+
+pub fn part_one(input: &str) -> Option<u64> {
+    //let input = "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124";
+    let ranges = get_range_vec(input);
+    Some(
+        ranges
+            .iter()
+            .map(|r| r.get_invalid_sum())
+            .fold(0, |count, s| count + s),
+    )
+}
+
+pub fn part_two(input: &str) -> Option<u64> {
+    None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_part_one() {
+        let result = part_one(&advent_of_code::template::read_file("examples", DAY));
+        assert_eq!(result, None);
+    }
+
+    #[test]
+    fn test_part_two() {
+        let result = part_two(&advent_of_code::template::read_file("examples", DAY));
+        assert_eq!(result, None);
+    }
+}
