@@ -1,3 +1,5 @@
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
+
 advent_of_code::solution!(2);
 
 #[derive(Debug)]
@@ -51,12 +53,7 @@ fn get_range_vec(input: &str) -> Vec<Range> {
 pub fn part_one(input: &str) -> Option<u64> {
     //let input = "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124";
     let ranges = get_range_vec(input);
-    Some(
-        ranges
-            .iter()
-            .map(|r| r.get_invalid_sum())
-            .fold(0, |count, s| count + s),
-    )
+    Some(ranges.par_iter().map(|r| r.get_invalid_sum()).sum::<u64>())
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
