@@ -35,11 +35,47 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    let input = "987654321111111
-811111111111119
-234234234234278
-818181911112111";
-    None
+    Some(
+        input
+            .par_lines()
+            .map(|l| {
+                let maxes: Vec<u8> = l[..12].chars().map(|c| c as u8 - 48).collect();
+                let mut max_pos = l.len() - 12;
+                let mut min_pos = 0;
+                maxes
+                    .iter()
+                    .map(|m| {
+                        let position = l.chars().position(|c| (c as u8 - 48) == *m).unwrap();
+                        // get max number within range
+                        if let Some(max) = l[min_pos..=max_pos].chars().max() {
+                            let max = max as u8 - 48;
+                            // if max > m or m's position outside of range: return max
+                            if max > *m || !((min_pos <= position) && (position <= max_pos)) {
+                                max_pos += 1;
+                                min_pos = l[min_pos..max_pos]
+                                    .chars()
+                                    .position(|c| (c as u8 - 48) == max)
+                                    .unwrap()
+                                    + min_pos
+                                    + 1;
+                                max
+                            } else {
+                                //m's position within range | max !> m => return m
+                                max_pos += 1;
+                                min_pos += 1;
+                                *m
+                            }
+                        } else {
+                            // there is DEFINITELY a max within the range
+                            unreachable!()
+                        }
+                    })
+                    .zip(1..13)
+                    .map(|(m, i)| (m as u64) * 10u64.pow(12 - i))
+                    .sum::<u64>()
+            })
+            .sum(),
+    )
 }
 
 #[cfg(test)]
