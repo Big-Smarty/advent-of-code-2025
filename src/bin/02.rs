@@ -24,14 +24,14 @@ impl Range {
     pub fn get_invalid_sum(&self) -> u64 {
         (self.min..=self.max)
             .into_par_iter()
-            .filter(|i| !check_validity(*i))
+            .filter(|i| !check_validity_improved(*i))
             .sum()
     }
 
     pub fn get_invalid_sum_2(&self) -> u64 {
         (self.min..=self.max)
-            .into_par_iter()
-            .filter(|i| !check_validity_2(*i))
+            .into_iter()
+            .filter(|i| !check_validity_2_improved(*i))
             .sum()
     }
 }
@@ -47,6 +47,18 @@ fn check_validity(id: u64) -> bool {
         } else {
             return true;
         }
+    }
+}
+
+fn check_validity_improved(id: u64) -> bool {
+    let id_len = id.ilog10() + 1;
+
+    if id_len % 2 != 0 {
+        true
+    } else {
+        let lower_half: u64 = id % 10u64.pow(id_len / 2);
+        let upper_half = (id - lower_half) / 10u64.pow(id_len / 2);
+        !(lower_half == upper_half)
     }
 }
 
@@ -76,6 +88,28 @@ fn check_validity_2(id: u64) -> bool {
             }
         })
         .fold(true, |out, b| out & b)
+}
+
+fn check_validity_2_improved(id: u64) -> bool {
+    let id_len = id.ilog10() + 1;
+    (1..=(id_len / 2))
+        .into_iter()
+        .map(|i| {
+            if id_len % i != 0 {
+                return true;
+            } else {
+                let chunk_size = i;
+
+                // create chunks with size chunk_size (i)
+                !(1..=(id_len / chunk_size))
+                    .map(|j| {
+                        (id % 10u64.pow(j * chunk_size) - (id % 10u64.pow((j - 1) * chunk_size)))
+                            / 10u64.pow((j - 1) * chunk_size)
+                    })
+                    .all(|x| x == (id % 10u64.pow(chunk_size)))
+            }
+        })
+        .all(|i| i)
 }
 
 fn get_range_vec(input: &str) -> Vec<Range> {
