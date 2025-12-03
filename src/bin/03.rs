@@ -1,6 +1,11 @@
 advent_of_code::solution!(3);
 
 pub fn part_one(input: &str) -> Option<u64> {
+    let input = "987654321111111
+811111111111119
+234234234234278
+818181911112111";
+
     None
 }
 
