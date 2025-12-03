@@ -39,18 +39,18 @@ pub fn part_two(input: &str) -> Option<u64> {
         input
             .par_lines()
             .map(|l| {
-                let maxes: Vec<u8> = l[..12].chars().map(|c| c as u8 - 48).collect();
                 let mut max_pos = l.len() - 12;
                 let mut min_pos = 0;
-                maxes
-                    .iter()
+                l[..12]
+                    .chars()
+                    .map(|c| c as u8 - 48)
                     .map(|m| {
-                        let position = l.chars().position(|c| (c as u8 - 48) == *m).unwrap();
+                        let position = l.chars().position(|c| (c as u8 - 48) == m).unwrap();
                         // get max number within range
                         if let Some(max) = l[min_pos..=max_pos].chars().max() {
                             let max = max as u8 - 48;
                             // if max > m or m's position outside of range: return max
-                            if max > *m || !((min_pos <= position) && (position <= max_pos)) {
+                            if max > m || !((min_pos <= position) && (position <= max_pos)) {
                                 max_pos += 1;
                                 min_pos = l[min_pos..max_pos]
                                     .chars()
@@ -63,7 +63,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                                 //m's position within range | max !> m => return m
                                 max_pos += 1;
                                 min_pos += 1;
-                                *m
+                                m
                             }
                         } else {
                             // there is DEFINITELY a max within the range
