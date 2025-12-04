@@ -10,6 +10,12 @@ publish = false
 [lib]
 doctest = false
 
+[profile.release]
+codegen-units = 1
+lto = "fat"
+panic = "abort"
+strip = "symbols"
+
 [profile.dhat]
 inherits = "release"
 debug = 1
@@ -30,3 +36,5 @@ tinyjson = "2.5.1"
 # Solution dependencies
 rayon = "1.11.0"
 itertools = "0.14.0"
+
+# optimization dependencies
