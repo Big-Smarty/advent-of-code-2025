@@ -1,3 +1,6 @@
+#![feature(new_range_api)]
+#![feature(iter_map_windows)]
+
 use advent_of_code::template::commands::{all, download, read, scaffold, solve, time};
 use args::{AppArguments, parse};
 
