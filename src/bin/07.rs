@@ -1,115 +1,62 @@
 advent_of_code::solution!(7);
 
 pub fn part_one(input: &str) -> Option<u64> {
-    let lines = input
-        .lines()
-        .filter(|l| !l.chars().all(|c| c == '.'))
-        .collect::<Vec<&str>>();
+    let lines = input.lines().step_by(2).collect::<Vec<&str>>();
 
     let mut cleared_lines: Vec<String> = Vec::new();
+    cleared_lines.resize(lines.len(), String::new());
 
     for y in 0..lines.len() {
-        cleared_lines.push(
-            lines[y]
-                .chars()
-                .enumerate()
-                .map(|(x, c)| {
-                    if (c == '.') | (c == 'S') {
-                        c
-                    } else {
-                        let mut out = '.';
-                        // walk from bottom to top
-                        for i in 1..=y {
-                            // if encountered another splitter above: return . (clear because invalid)
-                            if &cleared_lines[y - i][x..x + 1] == "^" {
-                                break;
-                            }
-                            // if encountered neighbouring splitter to path: return ^ (beam can intersect current splitter)
-                            else if (&cleared_lines[y - i][x - 1..x] == "^")
-                                | (&cleared_lines[y - i][x + 1..x + 2] == "^")
-                            {
-                                out = '^';
-                                break;
-                            }
-                            // if encountered starting point: return ^ (original beam can intersect current splitter)
-                            else if &cleared_lines[y - i][x..x + 1] == "S" {
-                                out = '^';
-                                break;
-                            }
+        cleared_lines[y] = lines[y]
+            .chars()
+            .enumerate()
+            .map(|(x, c)| {
+                if (c == '.') | (c == 'S') {
+                    c
+                } else {
+                    let mut out = '.';
+                    // walk from bottom to top
+                    for i in 1..=y {
+                        // if encountered another splitter above: return . (clear because invalid)
+                        if &cleared_lines[y - i][x..x + 1] == "^" {
+                            break;
                         }
-                        out
+                        // if encountered neighbouring splitter to path: return ^ (beam can intersect current splitter)
+                        else if (&cleared_lines[y - i][x - 1..x] == "^")
+                            | (&cleared_lines[y - i][x + 1..x + 2] == "^")
+                        {
+                            out = '^';
+                            break;
+                        }
+                        // if encountered starting point: return ^ (original beam can intersect current splitter)
+                        else if &cleared_lines[y - i][x..x + 1] == "S" {
+                            out = '^';
+                            break;
+                        }
                     }
-                })
-                .collect::<String>(),
-        );
+                    out
+                }
+            })
+            .collect::<String>();
     }
 
     Some(
         cleared_lines
             .iter()
             .map(|l| {
-                let mut encountered_splitter = false;
-                let mut splitter_count = 0;
-                for c in l.chars() {
-                    if c != '^' && !encountered_splitter {
-                        continue;
-                    } else if c == '^' && !encountered_splitter {
-                        encountered_splitter = true;
-                        splitter_count += 1;
-                    } else if c == '^' && encountered_splitter {
-                        splitter_count += 1;
-                    }
-                }
-                let out = splitter_count;
-                out
+                l.chars()
+                    .map(|c| match c {
+                        '^' => 1,
+                        _ => 0,
+                    })
+                    .sum::<u64>()
             })
             .sum(),
     )
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    let lines = input
-        .lines()
-        .filter(|l| !l.chars().all(|c| c == '.'))
-        .collect::<Vec<&str>>();
-
-    /*let mut cleared_lines: Vec<String> = Vec::new();
-
-    for y in 0..lines.len() {
-        cleared_lines.push(
-            lines[y]
-                .chars()
-                .enumerate()
-                .map(|(x, c)| {
-                    if (c == '.') | (c == 'S') {
-                        c
-                    } else {
-                        let mut out = '.';
-                        // walk from bottom to top
-                        for i in 1..=y {
-                            // if encountered another splitter above: return . (clear because invalid)
-                            if &cleared_lines[y - i][x..x + 1] == "^" {
-                                break;
-                            }
-                            // if encountered neighbouring splitter to path: return ^ (beam can intersect current splitter)
-                            else if (&cleared_lines[y - i][x - 1..x] == "^")
-                                | (&cleared_lines[y - i][x + 1..x + 2] == "^")
-                            {
-                                out = '^';
-                                break;
-                            }
-                            // if encountered starting point: return ^ (original beam can intersect current splitter)
-                            else if &cleared_lines[y - i][x..x + 1] == "S" {
-                                out = '^';
-                                break;
-                            }
-                        }
-                        out
-                    }
-                })
-                .collect::<String>(),
-        );
-    }*/
+    let lines = input.lines().step_by(2).collect::<Vec<&str>>();
 
     let mut previous_timeline: Vec<u64> = Vec::new();
     previous_timeline.resize(lines[0].len(), 0);
